@@ -1,30 +1,8 @@
-'''
-
-TODO
-
-The data portion:
-General:
-- Add the ability to load other datasets e.g. the wine dataset.
-
-UI:
-- Could make it non basic, but cba
-- Hook up variables with entry boxes and add conditional etc. For example, you should only be able to add a second variable after
-- Would be nice to have the axis variable names actually along the axis oriented as a normal graph would. NOt sure how hard/easy this would be to program.
-- Add a box for instructions.
-- Add option to enable/disable secondary variable. 
-
-Bugs:
-- Throws an error when I reset the canvas, as you can't take a mean of a slice, but it doesn't effect the functionality.
-'''
-
-
 import tkinter as tk
-from tkinter import *
+from tkinter import Canvas, Menu, Frame, DoubleVar, StringVar, IntVar, Label, Entry
 import tkinter.colorchooser
-
 import pandas as pd
 import numpy as np
-import random
 from itertools import count
 from scipy.stats import pearsonr
 
@@ -32,7 +10,7 @@ from scipy.stats import pearsonr
 # Class to create and store data points
 class Particle:
 
-    # this is used two assign different ids each time a class is called. There is probably  better way of doing this but it works.
+    # this is used two assign different ids each time a class is called. There is probably better way of doing this but it works.
     p_id = count(0)
 
     def __init__(self, x, y):
@@ -164,17 +142,11 @@ def update_gui_text():
 # GUI etc
 def dataCreator():
     # GLOBAL VARS
-    global root
-    global canvas
-    global clicks
-    global point_ids
-    global current_colour
-    global animation_status
+    global root , canvas, clicks, point_ids, current_colour, text_box
     global x_mean,x_mean_label, x_std, x_std_label, xe, e_cat, x_var_entry
     global y_mean, y_mean_label, y_std, y_std_label, ye, y_var_entry
     global n, n_label
     global Pearsons_R, Pearsons_R_label
-    global text_box
 
     
     point_ids = [] # store all the particle objects.
@@ -196,10 +168,6 @@ def dataCreator():
 
     frame = Frame(root)
     frame.grid(row=0,column=1, sticky="n")
-    
-    
-
-
 
     # menu items
     menubar = tk.Menu(root)
@@ -227,7 +195,6 @@ def dataCreator():
     x_var_entry.config(fg = current_colour) # This should always stay the base colour
     xe.set('X') # Default x label
 
-
     x_std = DoubleVar()
     x_std_label = Label(frame, text = f'X std: {x_std.get()}')
     x_std_label.grid(row=1,column=0, sticky="e")
@@ -249,7 +216,6 @@ def dataCreator():
     Pearsons_R_label = Label(frame, text = f'Pearson\'s R: {Pearsons_R.get()}')
     Pearsons_R_label.grid(row=4, column = 0, sticky = 'e')
 
-
     n = IntVar()
     n_label = Label(frame, text = f'N: {n.get()}')
     n_label.grid(row=5,column=0, sticky="e")
@@ -268,11 +234,9 @@ def dataCreator():
     frame.grid_rowconfigure(8, weight=1, minsize=100)
     text_box.grid(row = 20, column = 0, columnspan = 2)
 
-
-
     # run mainloop
     root.mainloop()
 
 
-#
+
 dataCreator()
