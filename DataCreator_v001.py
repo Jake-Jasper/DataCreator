@@ -3,9 +3,7 @@
 import tkinter as tk
 from tkinter import Canvas, Menu, Frame, DoubleVar, StringVar, IntVar, Label, Entry
 import tkinter.colorchooser
-# ~ from itertools import count
 
-import pandas as pd
 import numpy as np
 from scipy.stats import pearsonr
 
@@ -17,8 +15,6 @@ class Particle:
 
     def __init__(self, canvas, x, y):
         RADIUS_MODIFIER = 5
-        # increment ids by one
-        # ~ self.p_id = next(self.p_id)
 
         # x and y should also be unique at this point
         self.x = x
@@ -27,7 +23,6 @@ class Particle:
         self.point = canvas.create_oval(
             x-RADIUS_MODIFIER, y-RADIUS_MODIFIER, x+RADIUS_MODIFIER, y+RADIUS_MODIFIER,
             width = 0, fill = self.current_colour, tags = 'points')
-        # ~ self.location = (0,0,0,0) # wth is this?
 
 class Drawing(tk.Canvas):
     def __init__(self, master=None, **kwargs):
@@ -36,8 +31,6 @@ class Drawing(tk.Canvas):
 
         # Create the canvas and make it visible with pack()
         self.config(highlightthickness =2, highlightbackground = 'black')
-        # ~ canvas = tk.Canvas(root, highlightthickness =2, highlightbackground = 'black')
-        # ~ canvas.grid(row=0, column =0)
         self.config(background = 'white', width = 800, height = 700)
 
         # record clicks on canvas only.
@@ -167,14 +160,15 @@ class DataCreator(tk.Frame):
         width = self.draw_window.winfo_width()
         clicks = [(point.x, height-point.y) for point in self.draw_window.point_ids]
 
-        data = pd.DataFrame()
-        x = self.variables.x_var_entry.get()
-        y = self.variables.y_var_entry.get()
-        category = self.variables.x2_var_entry.get()
-        data[x] = np.asarray(clicks)[:,0] / width  # This changes the data so that (0,0) is SW, so it works correctly when plotting
-        data[y] = np.asarray(clicks)[:,1] / height # This changes the data so that (0,0) is SW, so it works correctly when plotting
-        data[category] = [point.category for point in self.draw_window.point_ids]
-        data.to_csv('data.csv', index = False)
+        x_name = self.variables.x_var_entry.get() # get the label for the x var
+        y_name = self.variables.y_var_entry.get() # get the label for the y var
+        category_name = self.variables.x2_var_entry.get() # get the label for the 3rd var
+        xs = np.asarray(clicks)[:,0] / width  # This changes the data so that (0,0) is SW, so it works correctly when plotting
+        ys = np.asarray(clicks)[:,1] / height # This changes the data so that (0,0) is SW, so it works correctly when plotting
+        cats = [point.category for point in self.draw_window.point_ids] # get all the values for the categorys, atm this is the hex code
+        data = np.array((xs,ys,cats)).T # concatenate the arrays so that we can write them to file
+        np.savetxt('data.csv', data, delimiter = ',', comments="", header = ','.join([x_name,y_name,category_name]), fmt="%s") # write to file
+
 
         # New window that confirms file has been saved
         window = tk.Toplevel()
