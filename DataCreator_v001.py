@@ -5,12 +5,9 @@ from tkinter import Canvas, Menu, Frame, DoubleVar, StringVar, IntVar, Label, En
 import tkinter.colorchooser
 
 import numpy as np
-from scipy.stats import pearsonr
 
 # Class to create and store data points
 class Particle:
-    # this is used two assign different ids each time a class is called. There is probably better way of doing this but it works.
-    # ~ p_id = count(0) # socal: This is as good a way as any ... but why do you need a point id?
     current_colour = '#000000' # Default black
 
     def __init__(self, canvas, x, y):
@@ -192,9 +189,13 @@ class DataCreator(tk.Frame):
         ymean = np.mean(ys) / height
         ystd = np.std(ys) / height
 
-        r, p = pearsonr(xs, ys)
+        r = 0 # default r^2
         n = len(point_ids)
-        self.stats.update_values([xmean, xstd, ymean, ystd, -r, n])
+        # only calculate r^2 if there is more than one point 
+        if n > 1:
+            r = np.corrcoef(xs, ys)[0, 1]**2
+
+        self.stats.update_values([xmean, xstd, ymean, ystd, r, n])
 
 def main():
     # create window
