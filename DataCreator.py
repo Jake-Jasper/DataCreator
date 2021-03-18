@@ -56,7 +56,19 @@ class Drawing(tk.Canvas):
         #update gui
         self.master.update_gui_text(self.point_ids)
 
-    # Recors click events and updates the screen
+    def undo(self):
+        if len(self.point_ids) > 0:
+            # delete the point_id
+            del self.point_ids[-1] 
+            # delete the last element from the canvas
+            self.delete(list(self.find_withtag('points'))[-1])
+            # update the gui text
+            self.master.update_gui_text(self.point_ids)
+            
+                      
+
+
+    # Records click events and updates the screen
     def click(self, event):
         # record clicks
         # create a new particle
@@ -135,6 +147,7 @@ class DataCreator(tk.Frame):
         filemenu.add_command(label="Save", command=self.file_save)
         menubar.add_cascade(label="Options", menu=filemenu)
         menubar.add_command(label="Change color", command=self.choose_color) #This changes the global color
+        menubar.add_command(label="Undo", command=self.draw_window.undo) #This changes the global color
 
         # add menubar
         self.master.config(menu=menubar)
