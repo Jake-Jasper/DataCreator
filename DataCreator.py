@@ -65,9 +65,6 @@ class Drawing(tk.Canvas):
             # update the gui text
             self.master.update_gui_text(self.point_ids)
             
-                      
-
-
     # Records click events and updates the screen
     def click(self, event):
         # record clicks
@@ -94,6 +91,10 @@ class StatsFrame(tk.Frame):
         for result_lbl, value in zip(self.data, new_data):
             result_lbl.config(text=f"{value:.2f}")
 
+'''
+I need to modify the calss below so that I can have the X and Y variable label and Entry boxes below the and to the left of the canvas
+'''
+
 class VariableFrame(tk.Frame):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
@@ -114,12 +115,12 @@ class VariableFrame(tk.Frame):
 
         ### Secondary X variable -- need a better name than x2 for this.
         self.e_cat = StringVar()
-        Label(self, text = '3rd Variable name:').grid(row=2, column=0, padx = 10)
+        Label(self, text = '2nd X labels:').grid(row=2, column=0, padx = 10)
         self.x2_var_entry = Entry(self, textvariable=self.e_cat)
         self.x2_var_entry.grid(row=2, column =1)
         self.x2_var_entry.config(fg = Particle.current_colour) # This should change to the new colour
         # Forget why I called this e_cat (maybe extra category), but once I think of that better name
-        self.e_cat.set('3rd Variable')
+        self.e_cat.set('sex: Male, Female')
 
 # GUI etc
 class DataCreator(tk.Frame):
