@@ -21,8 +21,7 @@ This is very much a beginner project
 
 ## Goals
 
+- Improve the implementation of secondary variables.
 - Add the ability to load other datasets e.g. the iris dataset.
-- Make the UI useful
-- Would be nice to have the axis variable names actually along the axis oriented as a normal graph would. Not sure how hard/easy this would be to program.
 - Add option to enable/disable secondary variable. 
 
