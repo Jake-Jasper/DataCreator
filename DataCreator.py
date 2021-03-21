@@ -133,11 +133,11 @@ class DataCreator(tk.Frame):
         self.stats = StatsFrame(self)
         self.stats.grid(row=0,column=1, sticky="n")
 
-        self.variables = VariableFrame(self)
-        self.variables.grid(row=0,column=2, sticky="n")
+        self.variables = VariableFrame(self, relief = 'raised')
+        self.variables.grid(row=1,column=1, columnspan = 2, sticky="n")
 
         text_box = Label(self, text = 'To create another variable, change the colour.  \n All points will be sub classified by colour')
-        text_box.grid(row = 1, column = 1, columnspan = 2, sticky='n')
+        text_box.grid(row = 2, column = 1, columnspan = 2, sticky='n')
 
         self.rowconfigure(2, weight=1)
         # menu items
