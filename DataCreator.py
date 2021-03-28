@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
 import tkinter as tk
-from tkinter import Canvas, Menu, Frame, DoubleVar, StringVar, IntVar, Label, Entry
-import tkinter.colorchooser
+from tkinter import Canvas, Menu, Frame, DoubleVar, StringVar, IntVar, Label, Entry, Scale, Button
 
 import numpy as np
+
 
 # Class to create and store data points
 class Particle:
     current_colour = '#000000' # Default black
+    current_category = 'None'
 
     def __init__(self, canvas, x, y):
         RADIUS_MODIFIER = 5
@@ -16,7 +17,7 @@ class Particle:
         # x and y should also be unique at this point
         self.x = x
         self.y = y
-        self.category = self.current_colour
+        self.category = self.current_category
         self.point = canvas.create_oval(
             x-RADIUS_MODIFIER, y-RADIUS_MODIFIER, x+RADIUS_MODIFIER, y+RADIUS_MODIFIER,
             width = 0, fill = self.current_colour, tags = 'points')
@@ -113,14 +114,9 @@ class VariableFrame(tk.Frame):
         self.y_var_entry.grid(row=1, column = 1)
         self.ye.set('Y')
 
-        ### Secondary X variable -- need a better name than x2 for this.
-        self.e_cat = StringVar()
-        Label(self, text = '2nd X labels:').grid(row=2, column=0, padx = 10)
-        self.x2_var_entry = Entry(self, textvariable=self.e_cat)
-        self.x2_var_entry.grid(row=2, column =1)
-        self.x2_var_entry.config(fg = Particle.current_colour) # This should change to the new colour
-        # Forget why I called this e_cat (maybe extra category), but once I think of that better name
-        self.e_cat.set('sex: Male, Female')
+        # Add sub variables
+        new_cat_button = Button(self, text = 'Add sub variable', command = color_picker().color_chooser)
+        new_cat_button.grid(row=2, column=0, padx = 10)
 
 # GUI etc
 class DataCreator(tk.Frame):
@@ -136,35 +132,22 @@ class DataCreator(tk.Frame):
         self.variables = VariableFrame(self, relief = 'raised')
         self.variables.grid(row=1,column=1, columnspan = 2, sticky="n")
 
-        text_box = Label(self, text = 'To create another variable, change the colour.  \n All points will be sub classified by colour')
-        text_box.grid(row = 2, column = 1, columnspan = 2, sticky='n')
-
         self.rowconfigure(2, weight=1)
+        
         # menu items
         menubar = tk.Menu(self.master)
         filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Reset", command=self.draw_window.reset_points)
+        menubar.add_command(label="Reset", command=self.draw_window.reset_points)
         filemenu.add_command(label="Exit", command=self.quit)
         filemenu.add_command(label="Save", command=self.file_save)
         menubar.add_cascade(label="Options", menu=filemenu)
-        menubar.add_command(label="Change color", command=self.choose_color) #This changes the global color
-        menubar.add_command(label="Undo", command=self.draw_window.undo) #This changes the global color
+        menubar.add_command(label="Undo", command=self.draw_window.undo)
 
         # add menubar
         self.master.config(menu=menubar)
 
-    # Change the color of the particles, and also will be used to identify the category a variable belongs to
-    def choose_color(self):
-        # variable to store hexadecimal code of color, it also retruns rgb, so I need to strip the hex code. "{rgb} #hexode"
-        color_code = tkinter.colorchooser.askcolor(title ="Choose color")
-        current_colour = color_code[1]
-        # set the colour of the second variable
-        self.variables.x2_var_entry.config(fg = current_colour)
 
-        # set the colour of the drawing points
-        Particle.current_colour = current_colour
-
-    # Save the current data. This needs a complete rework to take into account the sub-variables.
+    # Save the current data. 
     def file_save(self):
         #save data to a csv file
         height = self.draw_window.winfo_height()
@@ -173,13 +156,12 @@ class DataCreator(tk.Frame):
 
         x_name = self.variables.x_var_entry.get() # get the label for the x var
         y_name = self.variables.y_var_entry.get() # get the label for the y var
-        category_name = self.variables.x2_var_entry.get() # get the label for the 3rd var
+        category_name = 'sub variables' # find the more scientific naming schemes for this
         xs = np.asarray(clicks)[:,0] / width  # This changes the data so that (0,0) is SW, so it works correctly when plotting
         ys = np.asarray(clicks)[:,1] / height # This changes the data so that (0,0) is SW, so it works correctly when plotting
         cats = [point.category for point in self.draw_window.point_ids] # get all the values for the categorys, atm this is the hex code
         data = np.array((xs,ys,cats)).T # concatenate the arrays so that we can write them to file
         np.savetxt('data.csv', data, delimiter = ',', comments="", header = ','.join([x_name,y_name,category_name]), fmt="%s") # write to file
-
 
         # New window that confirms file has been saved
         window = tk.Toplevel()
@@ -210,6 +192,67 @@ class DataCreator(tk.Frame):
             r = np.corrcoef(xs, ys)[0, 1]**2
 
         self.stats.update_values([xmean, xstd, ymean, ystd, r, n])
+
+# Class that replicates the tkinter.colorchooser dialog
+class color_picker(DataCreator):
+    def __init__(self):
+        self.color = 'None'
+        self.new_cat_name = StringVar()
+    
+    # return the variables
+    def get_vars(self):
+        return self.color, self.new_cat_name
+    # get hex value
+    def rgbtohex(self, r,g,b):
+        return f'#{r:02x}{g:02x}{b:02x}'
+
+    # Function to update the color of the canvas
+    def update_col(self, val):
+        self.display_box.configure(bg = self.rgbtohex(self.R_scale.get(),self.G_scale.get(),self.B_scale.get()))
+
+    # Close the window and print chosen value
+    def close_dialog(self):
+        self.color = self.rgbtohex(self.R_scale.get(),self.G_scale.get(),self.B_scale.get())
+        self.new_cat_name = self.new_cat_entry.get()
+        Particle.current_colour, Particle.current_category = self.get_vars()
+
+        self.window.destroy()
+    
+    # Gui for the color chooser
+    def color_chooser(self):
+        # Create window
+        self.window = tk.Tk()
+        self.window.title('Choose a color')
+        self.window.geometry("356x200")
+
+        # Slider widgets
+        self.R_scale = Scale(master = self.window, length = 256, orient='horizontal', from_=0, to=255)
+        self.R_scale.grid(row = 0, column = 0)
+        self.G_scale = Scale(master = self.window, length = 256, orient='horizontal', from_=0, to=255)
+        self.G_scale.grid(row = 1, column = 0)
+        self.B_scale = Scale(master = self.window, length = 256, orient='horizontal', from_=0, to=255)
+        self.B_scale.grid(row = 2, column = 0)
+
+        # Bindings for mouse interactions
+        self.R_scale.bind("<Motion>", self.update_col)
+        self.G_scale.bind("<Motion>", self.update_col)
+        self.B_scale.bind("<Motion>", self.update_col)
+
+        # Canvas to display color
+        self.display_box = Canvas(master = self.window, width =90, height = 125, bg = self.rgbtohex(self.R_scale.get(),self.G_scale.get(),self.B_scale.get()))
+        self.display_box.grid(row = 0, rowspan =3, column = 1)
+
+        # Label and entry for new variable name
+        self.new_cat_label = Label(master = self.window, text = 'Enter variable name')
+        self.new_cat_label.grid(row=3, column=0)
+        self.new_cat_entry = Entry(master = self.window, textvariable=self.new_cat_name)
+        self.new_cat_entry.grid(row=4, column=0)
+
+        # Buttons to exit the dialog
+        self.ok_button = Button(master = self.window, text = 'Okay', command = self.close_dialog)
+        self.ok_button.grid(row = 5, column = 0)
+        self.close_button = Button(master = self.window, text = 'Cancel', command = self.window.destroy)
+        self.close_button.grid(row = 5, column = 1)
 
 def main():
     # create window
