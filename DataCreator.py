@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import tkinter as tk
-from tkinter import Canvas, Menu, Frame, DoubleVar, StringVar, IntVar, Label, Entry, Scale, Button
+from tkinter import Canvas, Menu, Frame, StringVar, IntVar, Label, Entry, Scale, Button
 
 import numpy as np
 
@@ -102,21 +102,44 @@ class VariableFrame(tk.Frame):
 
         # Add some boxes to show the stats.
         self.xe = StringVar()
-        Label(self, text = 'X name:').grid(row=0, column=0, padx = 10)
-        self.x_var_entry = Entry(self, textvariable=self.xe)
-        self.x_var_entry.grid(row=0, column =1)
-        self.x_var_entry.config(fg = Particle.current_colour) # This should always stay the base colour
+        Label(self, text = 'X name:').grid(row=1, column=0, padx = 10)
+        self.x_var_entry = Entry(self, width = 20, textvariable=self.xe)
+        self.x_var_entry.grid(row=1, column =1)
+        #self.x_var_entry.config(fg = 'black') # This should always stay the base colour
         self.xe.set('X') # Default x label
+        
+        # xmin max entry
+        Label(self, text = 'min').grid(row=0, column=2, padx = 10)
+        Label(self, text = 'max').grid(row=0, column=3, padx = 10)
+        self.xe_min = StringVar() # xe_min x entry min
+        self.xe_max = StringVar() # xe_min x entry min
+        self.x_var_entry_min = Entry(self, textvariable=self.xe_min, width = 5)
+        self.x_var_entry_min.grid(row=1, column =2)
+        self.xe_min.set("0.0") # default min
+        self.x_var_entry_max = Entry(self, textvariable=self.xe_max, width = 5)
+        self.x_var_entry_max.grid(row=1, column =3)
+        self.xe_max.set("1.0") # default max
 
+        # Y  var
         self.ye = StringVar()
-        Label(self, text = 'Y name:').grid(row=1, column =0, padx =20)
-        self.y_var_entry = Entry(self, textvariable = self.ye)
-        self.y_var_entry.grid(row=1, column = 1)
+        Label(self, text = 'Y name:').grid(row=2, column =0, padx =20)
+        self.y_var_entry = Entry(self, width = 20, textvariable = self.ye)
+        self.y_var_entry.grid(row=2, column = 1)
         self.ye.set('Y')
 
-        # Add sub variables
+        # y min max
+        self.ye_min = StringVar() # xe_min x entry min
+        self.ye_max = StringVar() # xe_min x entry min
+        self.y_var_entry_min = Entry(self, textvariable=self.ye_min, width = 5)
+        self.y_var_entry_min.grid(row=2, column =2)
+        self.ye_min.set("0.0") # default min
+        self.y_var_entry_max = Entry(self, textvariable=self.ye_max, width = 5)
+        self.y_var_entry_max.grid(row=2, column =3)
+        self.ye_max.set("1.0") # default max
+
+        # Add sub variables button
         new_cat_button = Button(self, text = 'Add sub variable', command = color_picker().color_chooser)
-        new_cat_button.grid(row=2, column=0, padx = 10)
+        new_cat_button.grid(row=3, column=0, padx = 10)
 
 # GUI etc
 class DataCreator(tk.Frame):
@@ -137,14 +160,18 @@ class DataCreator(tk.Frame):
         # menu items
         menubar = tk.Menu(self.master)
         filemenu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Options", menu=filemenu)
         menubar.add_command(label="Reset", command=self.draw_window.reset_points)
         filemenu.add_command(label="Exit", command=self.quit)
         filemenu.add_command(label="Save", command=self.file_save)
-        menubar.add_cascade(label="Options", menu=filemenu)
         menubar.add_command(label="Undo", command=self.draw_window.undo)
 
         # add menubar
         self.master.config(menu=menubar)
+
+    # Function to scale the points to the desired range
+    def scale_points(self, arr, low, high):
+        return [((i - min(arr)) / (max(arr) - min(arr))) * (high - low) + low for i in arr]
 
 
     # Save the current data. 
@@ -159,6 +186,10 @@ class DataCreator(tk.Frame):
         category_name = 'sub variables' # find the more scientific naming schemes for this
         xs = np.asarray(clicks)[:,0] / width  # This changes the data so that (0,0) is SW, so it works correctly when plotting
         ys = np.asarray(clicks)[:,1] / height # This changes the data so that (0,0) is SW, so it works correctly when plotting
+
+        xs = self.scale_points(xs, float(self.variables.xe_min.get()),  float(self.variables.xe_max.get())) # scale x 
+        ys = self.scale_points(ys, float(self.variables.ye_min.get()),  float(self.variables.ye_max.get())) # scale y
+
         cats = [point.category for point in self.draw_window.point_ids] # get all the values for the categorys, atm this is the hex code
         data = np.array((xs,ys,cats)).T # concatenate the arrays so that we can write them to file
         np.savetxt('data.csv', data, delimiter = ',', comments="", header = ','.join([x_name,y_name,category_name]), fmt="%s") # write to file
