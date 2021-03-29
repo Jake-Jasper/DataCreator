@@ -191,8 +191,13 @@ class DataCreator(tk.Frame):
         ys = self.scale_points(ys, float(self.variables.ye_min.get()),  float(self.variables.ye_max.get())) # scale y
 
         cats = [point.category for point in self.draw_window.point_ids] # get all the values for the categorys, atm this is the hex code
-        data = np.array((xs,ys,cats)).T # concatenate the arrays so that we can write them to file
-        np.savetxt('data.csv', data, delimiter = ',', comments="", header = ','.join([x_name,y_name,category_name]), fmt="%s") # write to file
+
+        if len(set(cats)) == 1:
+            data = np.array((xs,ys)).T # concatenate the arrays so that we can write them to file
+            np.savetxt('data.csv', data, delimiter = ',', comments="", header = ','.join([x_name,y_name]), fmt="%s") # write to file
+        else:    
+            data = np.array((xs,ys,cats)).T # concatenate the arrays so that we can write them to file
+            np.savetxt('data.csv', data, delimiter = ',', comments="", header = ','.join([x_name,y_name,category_name]), fmt="%s") # write to file
 
         # New window that confirms file has been saved
         window = tk.Toplevel()
