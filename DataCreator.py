@@ -3,7 +3,9 @@
 import tkinter as tk
 from tkinter import Canvas, Menu, Frame, StringVar, IntVar, Label, Entry, Scale, Button
 
-import numpy as np
+from statistics import mean, stdev
+from math import sqrt
+import csv
 
 
 # Class to create and store data points
@@ -193,11 +195,16 @@ class DataCreator(tk.Frame):
         cats = [point.category for point in self.draw_window.point_ids] # get all the values for the categorys, atm this is the hex code
 
         if len(set(cats)) == 1:
-            data = np.array((xs,ys)).T # concatenate the arrays so that we can write them to file
-            np.savetxt('data.csv', data, delimiter = ',', comments="", header = ','.join([x_name,y_name]), fmt="%s") # write to file
+            data = [[x_name, y_name]] # headers
+            data.extend([[x,y] for x, y in zip(xs,ys)])
         else:    
-            data = np.array((xs,ys,cats)).T # concatenate the arrays so that we can write them to file
-            np.savetxt('data.csv', data, delimiter = ',', comments="", header = ','.join([x_name,y_name,category_name]), fmt="%s") # write to file
+            data = [[x_name, y_name, category_name]] # headers
+            data.extend([[x,y, c] for x, y, c in zip(xs,ys, cats)])
+        
+        file = open('data.csv', 'w+', newline ='')
+        with file:    
+            write = csv.writer(file)
+            write.writerows(data)
 
         # New window that confirms file has been saved
         window = tk.Toplevel()
@@ -207,25 +214,36 @@ class DataCreator(tk.Frame):
         T.insert(tk.END, 'File saved')
         window.after(1000, window.destroy)
 
+    # All the stuff for r-squared, this gives the wrong answer, 
+    def get_rsquared(self, xs, ys):
+        xmean, ymean = mean(xs), mean(ys)
+        r = (sum([(x - xmean) * (y - ymean) for x, y in zip(xs, ys)]) / 
+        sqrt(sum([(x-xmean)**2 for x in xs]) * sum([(y-ymean)**2 for y in ys])))
+        return r**2
+        # Do the calculation
+
+
     def update_gui_text(self, point_ids):
         #save data to a csv file
         height = self.draw_window.winfo_height()
         width = self.draw_window.winfo_width()
         xs, ys = [point.x for point in point_ids], [point.y for point in point_ids]
-
-        # get the mean in the x plane
-        xmean = np.mean(xs) / width
-        xstd = np.std(xs) / width
-
-        # get the mean in the y plane, need to take into account the fact that 0,0 is nw
-        ymean = np.mean(ys) / height
-        ystd = np.std(ys) / height
+        n = len(point_ids)
+        
+        # get the mean in the x and y plane
+        xmean = mean(xs) / width
+        ymean = mean(ys) / height
+        if n > 1:
+            xstd = stdev(xs) / width
+            ystd = stdev(ys) / height
+        else:
+            xstd = 0
+            ystd = 0
 
         r = 0 # default r^2
-        n = len(point_ids)
         # only calculate r^2 if there is more than one point 
         if n > 1:
-            r = np.corrcoef(xs, ys)[0, 1]**2
+            r = self.get_rsquared(xs, ys)
 
         self.stats.update_values([xmean, xstd, ymean, ystd, r, n])
 
