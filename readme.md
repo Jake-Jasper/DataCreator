@@ -8,16 +8,25 @@ An example:
 
 ![image](Hippoplotamus.jpg)
 
-The image has a mean of 0.43 in the x-axis, and 0.48 in the Y with a correlation of 0.2. Currently the output is saved as a csv file.
+The image has a mean of 0.58 in the x-axis, and 0.52 in the Y with a correlation of 0.02. Currently the output is saved as a csv file.
 
-This is very much a beginner project 
+### Usage:
 
-## Looking for
+Copy ```DataCreator.py``` to you local directory
+```
+import DataCreator
 
-- Collaborators/mentors who can help with all the elements of development.
-	- project organisation
-	- general coding
-	- mentoring?
+Datacreator.main()
+```
+
+Currently, the way to create sub variables, In the example above for example, is to click the "add sub variable button" which will give the following dialog.
+
+![image](add_sub_var.jpg)
+
+In the example, the Blue colour is male and black Female.
+
+You can also set the scale of the data in the x and y direction.
+
 
 ## Goals
 For the upto date notes on what is currently being worked on [see here](#https://github.com/Jake-Jasper/DataCreator/projects/1) 
