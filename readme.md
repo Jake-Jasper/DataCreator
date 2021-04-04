@@ -21,7 +21,7 @@ Datacreator.main()
 
 Currently, the way to create sub variables, In the example above for example, is to click the "add sub variable button" which will give the following dialog.
 
-![image](add_sub_var.jpg)
+![image](Add_sub_var.jpg)
 
 In the example, the Blue colour is male and black Female.
 
