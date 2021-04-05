@@ -186,8 +186,10 @@ class DataCreator(tk.Frame):
         x_name = self.variables.x_var_entry.get() # get the label for the x var
         y_name = self.variables.y_var_entry.get() # get the label for the y var
         category_name = 'sub variables' # find the more scientific naming schemes for this
-        xs = np.asarray(clicks)[:,0] / width  # This changes the data so that (0,0) is SW, so it works correctly when plotting
-        ys = np.asarray(clicks)[:,1] / height # This changes the data so that (0,0) is SW, so it works correctly when plotting
+        xs = [i[0] for i in clicks]
+        ys = [i[1] for i in clicks]
+        #xs = np.asarray(clicks)[:,0] / width  # This changes the data so that (0,0) is SW, so it works correctly when plotting
+        #ys = np.asarray(clicks)[:,1] / height # This changes the data so that (0,0) is SW, so it works correctly when plotting
 
         xs = self.scale_points(xs, float(self.variables.xe_min.get()),  float(self.variables.xe_max.get())) # scale x 
         ys = self.scale_points(ys, float(self.variables.ye_min.get()),  float(self.variables.ye_max.get())) # scale y
