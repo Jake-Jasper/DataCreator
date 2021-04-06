@@ -29,7 +29,7 @@ You can also set the scale of the data in the x and y direction.
 
 
 ## Goals
-For the upto date notes on what is currently being worked on [see here](#https://github.com/Jake-Jasper/DataCreator/projects/1) 
+For the upto date notes on what is currently being worked on [see here](https://github.com/Jake-Jasper/DataCreator/projects/1) 
 
 - Improve the implementation of secondary variables.
 - Add the ability to load other datasets e.g. the iris dataset.
