@@ -12,7 +12,7 @@ The image has a mean of 0.58 in the x-axis, and 0.52 in the Y with a correlation
 
 ### Usage:
 
-Copy ```DataCreator.py``` to you local directory
+Copy ```DataCreator.py```, ```drawing.py```, ```particle.py``` to you local directory
 ```
 import DataCreator
 
@@ -31,7 +31,11 @@ You can also set the scale of the data in the x and y direction.
 ## Goals
 For the upto date notes on what is currently being worked on [see here](https://github.com/Jake-Jasper/DataCreator/projects/1) 
 
+- Make it a pip installable package
 - Improve the implementation of secondary variables.
 - Add the ability to load other datasets e.g. the iris dataset.
 - Add option to enable/disable secondary variable. 
 
+## Acknowledgements
+
+Thankyou to [JimShapedCoding](https://www.youtube.com/channel/UCU8d7rcShA7MGuDyYH1aWGg) for reviewing the project in [this](https://www.youtube.com/watch?v=iywqBdTTAfM) video
