@@ -12,7 +12,7 @@ The image has a mean of 0.58 in the x-axis, and 0.52 in the Y with a correlation
 
 ### Usage:
 
-Copy ```DataCreator.py```, ```drawing.py```, ```particle.py``` to you local directory
+Copy ```DataCreator.py```, ```drawing.py```, ```particle.py``` to you local directory or ```git clone https://github.com/Jake-Jasper/DataCreator.git```
 ```
 import DataCreator
 
